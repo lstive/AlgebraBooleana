@@ -10,10 +10,12 @@ class StackNode{
 class Stack{
 	constructor(){
 		this.top = null;
+		this.counter = 0;
 	}
 
 	push(value){
 		let temp = new StackNode(value);
+		this.counter = this.counter + 1;
 		if(this.top == null){
 			this.top = temp;
 		}else{
@@ -25,11 +27,16 @@ class Stack{
 	pop(){
 		let temp = null;
 		if(this.top != null){
+			this.counter = this.counter - 1;
 			temp = this.top;
 			this.top = this.top.nextPtr;
 			return temp.value;
 		}else{
 			return null;
 		}
+	}
+
+	getTop(){
+		return (this.top != null)? this.top.value:null;
 	}
 }
