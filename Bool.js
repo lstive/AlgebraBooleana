@@ -23,28 +23,39 @@ class Bool{
 	_makeNotation(){
 		let op = null;
 		for(let i = 0; i < this._expression.length; i++){
-			if(this._expression[i] == '('){
-				this._operators.push(this._expression[i]);
-			}else if(this._expression[i] == '+' || this._expression[i] == '.' || this._expression[i] == '!'){
+			if(this._expression[i] == '+'){
+				if(this._operators.getTop() == '.'){
+					this._values.push(this._operators.pop());
+					this._operators.push(this._expression[i]);
+				}else{
+					this._operators.push(this._expression[i]);
+				}
+			}else if(this._expression[i] == '.'){
+				if(this._operators.getTop() == '.'){
+					this._values.push(this._operators.pop());
+					this._operators.push(this._expression[i]);
+				}else{
+					this._operators.push(this._expression[i]);
+				}
+			}else if(this._expression[i] == '('){
 				this._operators.push(this._expression[i]);
 			}else if(this._expression[i] == ')'){
-				while((op = this._operators.pop()) != '('){
-					this._values.push(op);
+				while(this._operators.getTop() != '('){
+					this._values.push(this._operators.pop());
 				}
-			}else{
-				this._values.push(this._expression[i]);
+				this._operators.pop();
 
 				if(this._operators.getTop() == '!'){
-					console.log('entro');
-					if(this._values.getTop() == '1'){
-						this._values.pop();
-						this._values.push('0');
-					}else{
-						this._values.pop();
-						this._values.push('0');
-					}
-
-					this._operators.pop();
+					this._values.push(this._operators.pop());
+				}
+			}else if(this._expression[i] == '!'){
+				this._operators.push(this._expression[i]);
+			}else{
+				if(this._operators.getTop() == '!'){
+					this._values.push(this._expression[i]);
+					this._values.push(this._operators.pop());
+				}else{
+					this._values.push(this._expression[i]);
 				}
 			}
 		}
@@ -53,6 +64,7 @@ class Bool{
 	_changeValues(){
 		let setValues = new Set(this._expression);
 		setValues = Array.from(setValues);
+		setValues.sort();
 		
 		for(let i = 0; i < setValues.length; i++){
 			if(setValues[i] != '(' & setValues[i] != ')' & setValues[i] != '+' & setValues[i] != '.' & setValues[i] !='!'){
@@ -72,31 +84,29 @@ class Bool{
 	_eval(){
 		let temp = null;
 		let calc = new Stack();
+		let reverse = new Stack();
+		let op = '';
+
 		// evaluacion de las expresiones de algebra booleana
+		while(this._values.getTop() != null){
+			reverse.push(this._values.pop());
+		}
 
-		while(this._values.counter != 0){
-			temp = this._values.pop();
-
-			// evaluacion de operadores
-			if(temp == '+' || temp == '.' || temp == '!'){
-				this._operators.push(temp);
+		while(reverse.counter != 0){
+			temp = reverse.pop();
+			
+			if(temp == '+'){
+				reverse.push((calc.pop() | calc.pop())? '1':'0');
+				temp = reverse.getTop();
+			}else if(temp == '.'){
+				reverse.push((calc.pop() & calc.pop())? '1':'0');
+				temp = reverse.getTop();
 			}else{
 				calc.push(temp);
 
-				if(calc.counter == 1){
-					if(this._operators.getTop() == '!'){
-						this._values.push((calc.pop() == '1')? '0':'1');
-						this._operators.pop();
-					}
-				}else if(calc.counter > 1){
-					if(this._operators.getTop() == '+'){
-						temp = (calc.pop() | calc.pop())? '1':'0';
-					}else if(this._operators.getTop() == '.'){
-						temp = (calc.pop() & calc.pop())? '1':'0';
-					}
-
-					this._operators.pop();
-					this._values.push(temp);
+				if(reverse.getTop() == '!'){
+					calc.push((calc.pop() == '1')? '0':'1');
+					reverse.pop();
 				}
 			}
 		}
@@ -105,10 +115,5 @@ class Bool{
 	}
 }
 
-let bol = new Bool('(d+!((a+b).c).e)', '10011');
+let bol = new Bool('(d+!((a+b).c).e)', '01111');
 console.log(bol._eval());
-
-let vector = 'ugadr';
-vector = Array.from(vector);
-vector.sort();
-console.log(vector);
