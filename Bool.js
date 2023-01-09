@@ -8,12 +8,14 @@ class Bool{
 		this._operators = new Stack();
 		this._final = new Stack();
 		this._variables = new String();
+		this.res = '';
 		
 		if(param.length == 2){
 			this._expression = Array.from(param[0]);
 			this._bits = param[1];
 			this._changeValues();
 			this._makeNotation();
+			this._eval();
 			// evaluar si se proporciona la expresion con los bits
 		}else if(param.length == 1){
 			this._expression = Array.from(param[0]);
@@ -111,9 +113,48 @@ class Bool{
 			}
 		}
 
+		this.res = temp;
 		return temp;
+	}
+
+	redefine(expression){
+		this._expression = expression;
+	}
+
+	reeval(bits){
+		let res = (new Bool(this._expression, bits)).res;
+		this.res = res;
+		return res;
+	}
+
+	full(expression, bits){
+		this.redefine(expression);
+		this.res = this.reeval(bits);
+		return this.res;
 	}
 }
 
 let bol = new Bool('(d+!((a+b).c).e)', '01111');
-console.log(bol._eval());
+bol.redefine('(d+!((a+b).c).e)');
+console.log(bol.reeval('01111'));
+
+let bol2 = new Bool();
+bol2.full('(a.b)', '10');
+bol2.reeval('00');
+console.log(bol2.res);
+
+let bits = [
+	'00',
+	'01',
+	'10',
+	'11'
+];
+
+for(let i = 0; i < bits.length; i++){
+	bol2.reeval(bits[i]);
+	console.log(bits[i] + ' | ' + bol2.res);
+}
+
+let table = new BoolTable(3);
+console.log(table._createTable());
+
