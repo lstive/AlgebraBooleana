@@ -5,7 +5,6 @@ class BoolTable{
 	}
 
 	_createTable(){
-		console.log('ga');
 		for(let i = 0; i < Math.pow(2, this.order); i++){
 			this.table[i] = this._toBinary(i);
 		}

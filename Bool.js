@@ -63,6 +63,20 @@ class Bool{
 		}
 	}
 
+	getNVariables(){
+		let setValues = new Set(this._expression);
+		let count = 0;
+		setValues = Array.from(setValues);
+		
+		for(let i = 0; i < setValues.length; i++){
+			if(setValues[i] != '(' & setValues[i] != ')' & setValues[i] != '+' & setValues[i] != '.' & setValues[i] !='!'){
+				count++;
+			}
+		}
+		
+		return count;
+	}
+
 	_changeValues(){
 		let setValues = new Set(this._expression);
 		setValues = Array.from(setValues);
@@ -134,27 +148,13 @@ class Bool{
 	}
 }
 
-let bol = new Bool('(d+!((a+b).c).e)', '01111');
-bol.redefine('(d+!((a+b).c).e)');
-console.log(bol.reeval('01111'));
+let eval = new Bool();
+let truthTable = new BoolTable(3);
+let values = truthTable._createTable();
+eval.redefine('(a+b.c)');
 
-let bol2 = new Bool();
-bol2.full('(a.b)', '10');
-bol2.reeval('00');
-console.log(bol2.res);
-
-let bits = [
-	'00',
-	'01',
-	'10',
-	'11'
-];
-
-for(let i = 0; i < bits.length; i++){
-	bol2.reeval(bits[i]);
-	console.log(bits[i] + ' | ' + bol2.res);
+for(let i = 0; i < Math.pow(2, truthTable.order); i++){
+	console.log(values[i] + ' = ' + eval.reeval(values[i]));
 }
-
-let table = new BoolTable(3);
-console.log(table._createTable());
+console.log(eval.getNVariables());
 
